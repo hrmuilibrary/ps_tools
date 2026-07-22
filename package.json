@@ -1,6 +1,6 @@
 {
   "name": "@dinofront/design_system",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "description": "Enterprise React component library and design system built on Tailwind CSS.",
   "type": "module",
   "license": "MIT",
@@ -32,8 +32,7 @@
     "build:storybook": "storybook build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "publish": "npm run build && npm publish --access public"
+    "format:check": "prettier --check ."
   },
   "peerDependencies": {
     "react": "^19.0.0",
