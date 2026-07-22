@@ -1,5 +1,5 @@
 {
-  "name": "ps_library",
+  "name": "ps_design_system",
   "version": "0.1.0",
   "description": "Enterprise React component library and design system built on Tailwind CSS.",
   "type": "module",
@@ -32,7 +32,8 @@
     "build:storybook": "storybook build",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "publish": "npm run build && npm publish --access public"
   },
   "peerDependencies": {
     "react": "^19.0.0",

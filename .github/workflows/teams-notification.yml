@@ -1,0 +1,142 @@
+name: Teams Notification on Pull Request Events
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  send_teams_notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Send Adaptive Card to Teams
+        run: |
+          curl -X POST "${{ secrets.TEAMS_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "type": "AdaptiveCard",
+              "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+              "version": "1.5",
+              "msteams": {
+                "width": "Full"
+              },
+              "body": [
+                {
+                  "type": "Container",
+                  "style": "emphasis",
+                  "bleed": true,
+                  "items": [
+                    {
+                      "type": "ColumnSet",
+                      "columns": [
+                        {
+                          "type": "Column",
+                          "width": "auto",
+                          "items": [
+                            {
+                              "type": "TextBlock",
+                              "text": "🚀",
+                              "size": "ExtraLarge"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "Column",
+                          "width": "stretch",
+                          "items": [
+                            {
+                              "type": "TextBlock",
+                              "text": "New Pull Request",
+                              "weight": "Bolder",
+                              "size": "Large",
+                              "wrap": true
+                            },
+                            {
+                              "type": "TextBlock",
+                              "text": "@frontend review requested",
+                              "spacing": "None",
+                              "color": "Accent",
+                              "wrap": true
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "spacing": "Medium",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "${{ github.event.pull_request.title }}",
+                      "weight": "Bolder",
+                      "size": "Medium",
+                      "wrap": true
+                    }
+                  ]
+                },
+                {
+                  "type": "FactSet",
+                  "facts": [
+                    {
+                      "title": "Author",
+                      "value": "${{ github.event.pull_request.user.login }}"
+                    },
+                    {
+                      "title": "Repository",
+                      "value": "${{ github.repository }}"
+                    },
+                    {
+                      "title": "Source",
+                      "value": "${{ github.event.pull_request.head.ref }}"
+                    },
+                    {
+                      "title": "Target",
+                      "value": "${{ github.event.pull_request.base.ref }}"
+                    },
+                    {
+                      "title": "PR Number",
+                      "value": "#${{ github.event.pull_request.number }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "Container",
+                  "spacing": "Medium",
+                  "items": [
+                    {
+                      "type": "TextBlock",
+                      "text": "Pull Request Description",
+                      "weight": "Bolder",
+                      "wrap": true
+                    },
+                    {
+                      "type": "TextBlock",
+                      "text": "${{ github.event.pull_request.body || 'No description provided.' }}",
+                      "wrap": true,
+                      "maxLines": 6,
+                      "spacing": "Small"
+                    }
+                  ]
+                }
+              ],
+              "actions": [
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "🔍 View Pull Request",
+                  "url": "${{ github.event.pull_request.html_url }}"
+                },
+                {
+                  "type": "Action.OpenUrl",
+                  "title": "📂 Open Repository",
+                  "url": "${{ github.server_url }}/${{ github.repository }}"
+                }
+              ]
+            }'
