@@ -1,0 +1,153 @@
+name: Publish Package
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.BOT_ACCESS_TOKEN }}
+      - name: Setup Git
+        run: |
+          git config --global user.name "dino-front-bot"
+          git config --global user.email "dinofront.libs@gmail.com"
+
+      - name: Specify Node Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create .npmrc file
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_NEW_AUTH_TOKEN }}" > ~/.npmrc
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_NEW_AUTH_TOKEN }}
+        run: npm publish
+
+      - run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - run: echo "PACKAGE_NAME=$(node -p "require('./package.json').name")" >> $GITHUB_ENV
+
+      - name: Send Adaptive Card to Teams
+        run: |
+             curl -X POST "${{ secrets.TEAMS_WEBHOOK_URL }}" \
+               -H "Content-Type: application/json" \
+               -d '{
+                 "type": "AdaptiveCard",
+                 "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                 "version": "1.5",
+                 "msteams": {
+                   "width": "Full"
+                 },
+                 "body": [
+                   {
+                     "type": "Container",
+                     "style": "good",
+                     "bleed": true,
+                     "items": [
+                       {
+                         "type": "ColumnSet",
+                         "columns": [
+                           {
+                             "type": "Column",
+                             "width": "auto",
+                             "items": [
+                               {
+                                 "type": "TextBlock",
+                                 "text": "📦",
+                                 "size": "ExtraLarge"
+                               }
+                             ]
+                           },
+                           {
+                             "type": "Column",
+                             "width": "stretch",
+                             "items": [
+                               {
+                                 "type": "TextBlock",
+                                 "text": "NPM Package Published",
+                                 "weight": "Bolder",
+                                 "size": "Large",
+                                 "wrap": true
+                               },
+                               {
+                                 "type": "TextBlock",
+                                 "text": "${{ env.PACKAGE_NAME }}@${{ env.VERSION }}",
+                                 "spacing": "None",
+                                 "color": "Good",
+                                 "weight": "Bolder",
+                                 "wrap": true
+                               }
+                             ]
+                           }
+                         ]
+                       }
+                     ]
+                   },
+                   {
+                     "type": "FactSet",
+                     "facts": [
+                       {
+                         "title": "Package",
+                         "value": "${{ env.PACKAGE_NAME }}"
+                       },
+                       {
+                         "title": "Version",
+                         "value": "${{ env.VERSION }}"
+                       },
+                       {
+                         "title": "Repository",
+                         "value": "${{ github.repository }}"
+                       },
+                       {
+                         "title": "Workflow",
+                         "value": "${{ github.workflow }}"
+                       },
+                       {
+                         "title": "Run Number",
+                         "value": "#${{ github.run_number }}"
+                       }
+                     ]
+                   }
+                 ],
+                 "actions": [
+                   {
+                     "type": "Action.OpenUrl",
+                     "title": "🚀 View Pipeline",
+                     "url": "${{ env.PIPE_URL }}"
+                   },
+                   {
+                     "type": "Action.OpenUrl",
+                     "title": "📂 Open Repository",
+                     "url": "${{ github.server_url }}/${{ github.repository }}"
+                   }
+                 ]
+               }'
+
+      - run: echo "PIPE_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID|Pipeline#$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+      # Deployment on GitHub Pages
+      - name: Build Storybook
+        run: npm run build:storybook
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./storybook-static
+          enable_jekyll: false
