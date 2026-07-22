@@ -1,5 +1,5 @@
 {
-  "name": "ps-design_system",
+  "name": "design_system",
   "version": "0.1.0",
   "description": "Enterprise React component library and design system built on Tailwind CSS.",
   "type": "module",
