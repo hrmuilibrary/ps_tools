@@ -1,0 +1,74 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as UploadStories from './Upload.stories';
+
+<Meta of={UploadStories} />
+
+# Upload
+
+A drag-and-drop file dropzone (`Upload`) paired with a row component for
+listing files as they're processed (`UploadItem`). Both live in a single
+`Upload.tsx` file since they're always used together — `Upload` never
+renders the list itself, it just hands files to `onFiles` and leaves
+tracking/rendering upload state to the consumer via `UploadItem`.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Choosing a file
+
+Clicking or dragging a file onto the dropzone calls `onFiles(files: File[])`.
+There's no internal file list — `Upload` is a pure trigger. Pair it with
+your own state (or a list of `UploadItem`s) to track what's in flight:
+
+```tsx
+const [fileNames, setFileNames] = useState<string[]>([]);
+
+<Upload
+  accept=".png,.jpg"
+  maxSizeMB={10}
+  onFiles={(files) => setFileNames(files.map((f) => f.name))}
+/>
+```
+
+## Hint text
+
+The hint under "Choose a file or drag & drop it here" is derived
+automatically from `accept`/`maxSizeMB` (e.g. `"PNG, up to 10 MB"`) unless
+you pass `hint` explicitly. `maxSizeMB` is display-only — `Upload` doesn't
+reject oversized files itself; enforce that limit in your `onFiles` handler
+and surface it via `UploadItem`'s `error` status.
+
+## UploadItem statuses
+
+`UploadItem` renders one of three states via its `status` prop:
+
+- `"processing"` (default) — shows a progress bar driven by `progress` (0-100).
+- `"completed"` — shows a success check and swaps the remove button's icon
+  to a trash can.
+- `"error"` — tints the row red and shows `errorText`, with an optional
+  "Try again" link when `onRetry` is passed.
+
+<Stories />
+
+## Overriding styles
+
+Both `Upload` and `UploadItem` resolve their `className` prop through the
+same `cn()` merge utility the rest of the library uses, so an app-level
+override always wins over the component defaults:
+
+```tsx
+<Upload className="border-brand-500 bg-brand-20" />
+```
+
+## Composition
+
+`Upload` forwards its ref to the dropzone `<div>` and `UploadItem` forwards
+its ref to its own row `<div>`; both spread the remaining native `<div>`
+attributes, so they compose with the rest of the library without a
+separate "as child" API. The dropzone's own interactive attributes
+(`role`, `tabIndex`, click/drag/keyboard handlers) are owned internally and
+excluded from the prop type — pass `id`, `aria-label`, `style`, etc. as
+usual.

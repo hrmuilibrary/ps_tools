@@ -1,0 +1,137 @@
+import { useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Upload, UploadItem } from './Upload';
+
+const meta = {
+  title: 'Components/Upload',
+  component: Upload,
+  // Docs page is authored by hand in Upload.docs.mdx instead of the
+  // `autodocs` tag, per the architecture's Component.docs.mdx convention.
+  parameters: {
+    layout: 'centered',
+  },
+  args: {
+    disabled: false,
+  },
+  decorators: [
+    (Story) => (
+      <div className="w-96">
+        <Story />
+      </div>
+    ),
+  ],
+} satisfies Meta<typeof Upload>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Primary: Story = {};
+
+export const WithAcceptAndMaxSize: Story = {
+  name: 'With accept & maxSizeMB',
+  args: {
+    accept: '.png,.jpg',
+    maxSizeMB: 10,
+  },
+};
+
+export const WithCustomHint: Story = {
+  args: {
+    hint: 'SVG or PDF, up to 5 MB',
+  },
+};
+
+export const Multiple: Story = {
+  args: {
+    multiple: true,
+    hint: 'Select as many files as you need',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+  },
+};
+
+export const CustomClassName: Story = {
+  name: 'Overriding classes via className',
+  args: {
+    className: 'border-brand-500 bg-brand-20',
+  },
+};
+
+export const Interactive: Story = {
+  render: (args) => {
+    function InteractiveDemo() {
+      const [fileNames, setFileNames] = useState<string[]>([]);
+      return (
+        <div className="flex flex-col gap-3">
+          <Upload {...args} onFiles={(files) => setFileNames(files.map((file) => file.name))} />
+          {fileNames.length > 0 && (
+            <ul className="text-p-sm text-fg-secondary list-disc pl-5">
+              {fileNames.map((name) => (
+                <li key={name}>{name}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      );
+    }
+    return <InteractiveDemo />;
+  },
+};
+
+export const ItemProcessing: Story = {
+  name: 'UploadItem — processing',
+  render: () => (
+    <UploadItem name="quarterly-report.pdf" meta="2.4 MB" status="processing" progress={62} />
+  ),
+};
+
+export const ItemCompleted: Story = {
+  name: 'UploadItem — completed',
+  render: () => (
+    <UploadItem
+      name="quarterly-report.pdf"
+      meta="2.4 MB"
+      status="completed"
+      onRemove={() => {}}
+    />
+  ),
+};
+
+export const ItemError: Story = {
+  name: 'UploadItem — error',
+  render: () => (
+    <UploadItem
+      name="quarterly-report.pdf"
+      meta="2.4 MB"
+      status="error"
+      errorText="Upload failed. Check your connection and try again."
+      onRetry={() => {}}
+      onRemove={() => {}}
+    />
+  ),
+};
+
+export const ItemList: Story = {
+  name: 'Upload + UploadItem list',
+  render: (args) => (
+    <div className="flex flex-col gap-3">
+      <Upload {...args} />
+      <div className="flex flex-col gap-2">
+        <UploadItem name="brand-guidelines.pdf" meta="1.1 MB" status="completed" onRemove={() => {}} />
+        <UploadItem name="hero-image.png" meta="4.8 MB" status="processing" progress={35} onRemove={() => {}} />
+        <UploadItem
+          name="dataset.csv"
+          meta="18 MB"
+          status="error"
+          errorText="File exceeds the 10 MB limit."
+          onRetry={() => {}}
+          onRemove={() => {}}
+        />
+      </div>
+    </div>
+  ),
+};

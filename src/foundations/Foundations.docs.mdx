@@ -1,0 +1,51 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations" />
+
+# Foundations
+
+The design tokens everything else in this library builds on: a raw palette
+scale, semantic aliases, radii, shadows, and typography. They're mirrored in
+two parallel representations that are kept in sync by hand:
+
+1. **CSS custom properties** — `src/styles/tokens.css` (raw palette scales,
+   radii, shadows, typography) and `src/styles/theme.css` (semantic
+   aliases), both declared inside Tailwind v4 `@theme { ... }` blocks.
+   Declaring a variable inside `@theme` both registers the CSS custom
+   property _and_ auto-generates the matching utility class — e.g.
+   `--color-brand-500` gives you `bg-brand-500`, `text-brand-500`, etc. for
+   free, no extra mapping layer needed.
+2. **JS/TS token objects** — `src/tokens/*.ts` (`colors`, `typography`,
+   `spacing`, `radius`, `shadows`), for consumers who need token values in
+   JS rather than as CSS classes.
+
+## Semantic aliases over raw scale
+
+Components should reference semantic aliases (`bg-default`, `fg-brand`,
+`border-danger`, ...) rather than the raw palette scale (`brand-500`,
+`red-700`, ...) directly, except for a handful of deliberate cases (e.g.
+`bg-brand-500` for a primary button). Semantic aliases are what make dark
+mode work without touching component code — `theme.css` reassigns the same
+custom property names inside a `.dark { ... }` block, and Tailwind
+utilities always read the variable at the point of use rather than at
+declaration time. Toggle the **Theme** control in the toolbar above to see
+this live on the [Colors](/docs/foundations-colors--docs) page.
+
+## Typography scale
+
+Typography uses a semantic scale, not Tailwind's default `xs`/`sm`/`base`/
+`lg`: `text-h-*` (headline), `text-p-*` (body), `text-label-*` (labels).
+Each step is a `[fontSize, lineHeight]` pair — see
+[Typography](/docs/foundations-typography--docs).
+
+## Pages in this section
+
+- **[Colors](/docs/foundations-colors--docs)** — the raw palette scale
+  (brand, gray, green, blue, purple, pink, red, yellow) and the semantic
+  aliases built on top of it (surfaces, foreground, borders, icons).
+- **[Typography](/docs/foundations-typography--docs)** — the headline,
+  paragraph, and label scales.
+- **[Radius](/docs/foundations-radius--docs)** — the border-radius scale,
+  from `rounded-xs` to `rounded-full`.
+- **[Shadows](/docs/foundations-shadows--docs)** — the elevation scale,
+  from `shadow-z1` to `shadow-z5`.

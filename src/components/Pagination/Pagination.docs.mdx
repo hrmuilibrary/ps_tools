@@ -1,0 +1,52 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as PaginationStories from './Pagination.stories';
+
+<Meta of={PaginationStories} />
+
+# Pagination
+
+Navigates between pages of a list or table. A controlled component — it
+holds no internal page state, so the consumer owns `page` and updates it in
+response to `onPageChange`. Renders a compact range of page numbers with
+ellipses for the pages skipped in between, computed from `siblingCount` and
+`boundaryCount`.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Range algorithm
+
+`siblingCount` controls how many page numbers show on each side of the
+current page; `boundaryCount` controls how many always show at the very
+start and end of the range. Once `pageCount` is small enough that every page
+fits without skipping any, no ellipsis is rendered at all — see "Few pages"
+in the stories below.
+
+## Overriding styles
+
+Because `Pagination` resolves its `className` prop through the same `cn()`
+merge utility the rest of the library uses, an app-level override always
+wins over the defaults:
+
+```tsx
+<Pagination
+  page={page}
+  pageCount={pageCount}
+  onPageChange={setPage}
+  className="gap-2 p-2 bg-bg-container rounded-lg"
+/>
+```
+
+## Composition
+
+`Pagination` forwards its ref to the root `<nav>` element and spreads all
+native `<nav>` props, so a native `aria-label` (default `"Pagination"`)
+overrides the default the same way any other prop would, without a
+separate custom prop for it.
+
+## Variants
+
+<Stories />

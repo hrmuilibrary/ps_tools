@@ -1,0 +1,33 @@
+@import 'tailwindcss';
+
+@import './tokens.css';
+@import './theme.css';
+
+/*
+ * Class-based dark mode: `dark:` utilities activate when `.dark` is present
+ * on an ancestor, instead of Tailwind's default `prefers-color-scheme`
+ * media query. Consumer apps toggle dark mode by adding/removing this class
+ * on <html> (see the ThemeProvider example in the README).
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * tokens.css and theme.css declare their variables inside `@theme` blocks,
+ * so Tailwind already generates every utility (bg-brand-500, bg-bg-default,
+ * text-fg-secondary, border-border-brand, rounded-xl, shadow-z2, text-h-xl,
+ * font-ps, ...) directly — no extra `@theme inline` mapping layer needed
+ * here. The `.dark` overrides in theme.css keep working because they
+ * reassign the same custom properties, and Tailwind's utilities always read
+ * the variable at the point of use.
+ */
+@layer base {
+  * {
+    border-color: var(--color-border-default);
+  }
+
+  body {
+    background-color: var(--color-bg-default);
+    color: var(--color-fg-default);
+    font-family: var(--font-sans);
+  }
+}

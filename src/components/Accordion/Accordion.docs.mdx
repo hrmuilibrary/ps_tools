@@ -1,0 +1,75 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as AccordionStories from './Accordion.stories';
+
+<Meta of={AccordionStories} />
+
+# Accordion
+
+Vertically stacked, collapsible sections. `Accordion` owns the open/closed
+state for its `AccordionItem` children via context — items don't manage
+state themselves, they just read whether their `value` is in the open set
+and call `toggle` on click.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Single vs. multiple
+
+`type="single"` (the default) keeps at most one item open — opening a new
+item closes whichever one was open. `type="multiple"` allows any number of
+items open at once, each toggling independently.
+
+## Controlled vs. uncontrolled
+
+Uncontrolled usage passes `defaultValue` (a string for `single`, a string
+array for `multiple`) and `Accordion` tracks open state internally.
+Controlled usage passes both `value` and `onValueChange`, and the consumer
+owns the state entirely — same shape as an uncontrolled/controlled form
+input.
+
+```tsx
+const [value, setValue] = useState('billing');
+
+<Accordion value={value} onValueChange={(next) => setValue(next as string)}>
+  <AccordionItem value="billing" title="How does billing work?">
+    ...
+  </AccordionItem>
+</Accordion>
+```
+
+## Icons & disabled items
+
+`AccordionItem` accepts an optional `icon` node rendered before the title,
+and a `disabled` flag that blocks toggling and dims the trigger — same
+`disabled:opacity-50 disabled:cursor-not-allowed` treatment used elsewhere
+in the library.
+
+## Variants
+
+<Stories />
+
+## Overriding styles
+
+Both `Accordion` and `AccordionItem` resolve their `className` prop through
+the same `cn()` merge utility the rest of the library uses, so an
+app-level override always wins over the component defaults:
+
+```tsx
+<Accordion className="border-brand-500 shadow-z3">
+  <AccordionItem value="billing" title="How does billing work?">
+    ...
+  </AccordionItem>
+</Accordion>
+```
+
+## Composition
+
+`Accordion` forwards its ref to the root `<div>` and `AccordionItem`
+forwards its ref to its own root `<div>`; both spread all native `<div>`
+attributes, so they compose with the rest of the library without a
+separate "as child" API. `AccordionItem` must always be rendered inside an
+`Accordion` — it reads open state from context and throws if that context
+is missing.

@@ -1,0 +1,54 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as NotificationBadgeStories from './NotificationBadge.stories';
+
+<Meta of={NotificationBadgeStories} />
+
+# NotificationBadge
+
+Renders a count or dot indicator, either as a standalone element or overlaid
+on a `children` element (an icon, avatar, or nav item). Styled with plain
+Tailwind utility classes resolved from `variant`/`size` lookup tables — no
+variant-authoring abstraction on top, so consumer apps can override any part
+of it via `className` (merged with `tailwind-merge`, last conflicting class
+wins) rather than fighting a pre-hidden style layer.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Variants
+
+<Stories />
+
+## Behavior
+
+- `kind="count"` shows the numeric `count`, formatted via `max` (e.g. `99+`
+  once `count` exceeds `max`) and abbreviated at `1000+` (e.g. `2K`).
+  `kind="dot"` ignores `count` and always renders once shown.
+- By default a `count` of `0` renders nothing; pass `showZero` to render the
+  badge anyway.
+- When `children` is provided, `NotificationBadge` wraps it in a
+  `relative inline-flex` span and positions the badge absolutely in the
+  top-right corner. Without `children`, the badge renders inline in normal
+  flow.
+
+## Overriding styles
+
+Because `NotificationBadge` resolves its `className` prop through the same
+`cn()` merge utility the rest of the library uses, an app-level override
+always wins over the variant defaults:
+
+```tsx
+<NotificationBadge className="bg-purple-500 ring-offset-0">
+  <Bell className="size-6" />
+</NotificationBadge>
+```
+
+## Composition
+
+`NotificationBadge` forwards its ref and spreads all native `<span>` props
+onto the badge element itself — the same element `className`, `ref`, and
+`dataTestId` all target, whether the badge renders standalone or overlaid on
+`children`.

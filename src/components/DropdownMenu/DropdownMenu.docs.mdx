@@ -1,0 +1,101 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as DropdownMenuStories from './DropdownMenu.stories';
+
+<Meta of={DropdownMenuStories} />
+
+# DropdownMenu
+
+Reveals a floating list of actions or options anchored to a trigger.
+`DropdownMenu` is a compound component: it owns the open/closed state via
+context and shares it with `DropdownTrigger` and `DropdownContent` — the
+sub-components don't manage state themselves, they just read the current
+state and call back into it.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Composition
+
+Render a `DropdownTrigger` wrapping a single element (any component that
+accepts `onClick`, e.g. `Button`), followed by a `DropdownContent` holding
+`DropdownItem`s, optional `DropdownSeparator`s, and an optional
+`DropdownLabel`.
+
+```tsx
+<DropdownMenu>
+  <DropdownTrigger>
+    <Button variant="secondary">Options</Button>
+  </DropdownTrigger>
+  <DropdownContent>
+    <DropdownItem>Edit</DropdownItem>
+    <DropdownItem destructive>Delete</DropdownItem>
+  </DropdownContent>
+</DropdownMenu>
+```
+
+`DropdownTrigger` clones its child element rather than rendering its own
+DOM node: it attaches the click handler that toggles the menu (composed
+with any `onClick` the child already has — the toggle is skipped if that
+handler calls `preventDefault()`) plus `aria-haspopup="menu"` and
+`aria-expanded`, and points an internal ref at the child so
+`DropdownContent` can tell trigger clicks apart from outside clicks.
+Because of this, `DropdownTrigger` accepts exactly one child element and
+has no styling or `dataTestId` of its own — put `dataTestId` on the child
+being wrapped instead.
+
+## Controlled vs. uncontrolled
+
+Uncontrolled usage passes nothing (or `defaultOpen`) and `DropdownMenu`
+tracks the open state internally, closing automatically whenever a
+`DropdownItem` is selected, `Escape` is pressed, or a click lands outside
+the trigger and content. Controlled usage passes both `open` and
+`onOpenChange`, and the consumer owns the state entirely — same shape as
+an uncontrolled/controlled form input.
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<DropdownMenu open={open} onOpenChange={setOpen}>
+  <DropdownTrigger>
+    <Button variant="secondary">Options</Button>
+  </DropdownTrigger>
+  <DropdownContent>
+    <DropdownItem onSelect={() => setOpen(false)}>Edit</DropdownItem>
+  </DropdownContent>
+</DropdownMenu>;
+```
+
+<Stories />
+
+## Items
+
+`DropdownItem` accepts an optional `icon` node (rendered before the
+label), a `shortcut` node (e.g. a keyboard shortcut, rendered after the
+label), a `destructive` flag that recolors the item into the danger
+palette, and a `checked` prop that renders a leading check mark when
+`true` and reserves the same space (unchecked) when `false` — useful for
+a small set of mutually exclusive or toggleable options. Leave `checked`
+`undefined` for items with no check state at all. `onSelect` fires after
+any native `onClick`, and the menu closes right after — a native
+`disabled` attribute blocks both.
+
+## Overriding styles
+
+`DropdownContent`, `DropdownItem`, `DropdownSeparator`, and
+`DropdownLabel` all resolve their `className` prop through the same
+`cn()` merge utility the rest of the library uses, so an app-level
+override always wins over the component defaults.
+
+## Ref forwarding
+
+`DropdownMenu`, `DropdownContent`, `DropdownSeparator`, and
+`DropdownLabel` forward their ref to their own root `<div>`; `DropdownItem`
+forwards its ref to its root `<button>`. All four spread their remaining
+native attributes. `DropdownTrigger` has no root node of its own to
+forward a ref to — it clones its child instead. `DropdownTrigger`,
+`DropdownContent`, `DropdownItem`, `DropdownSeparator`, and `DropdownLabel`
+must always be rendered inside a `DropdownMenu` — they read state from
+context and throw if that context is missing.

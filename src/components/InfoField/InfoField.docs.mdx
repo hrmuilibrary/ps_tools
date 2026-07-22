@@ -1,0 +1,66 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as InfoFieldStories from './InfoField.stories';
+
+<Meta of={InfoFieldStories} />
+
+# InfoField
+
+A labeled value row with a leading tinted `IconTile`, an uppercase label,
+the value itself, and an optional right-aligned action slot. The General
+Information block on the Profile page uses this primitive; settings /
+contact / payroll detail pages reach for the same shape. Styled with plain
+Tailwind utility classes — no variant-authoring abstraction on top.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Tones
+
+<Stories />
+
+## Composing value and action
+
+`InfoField` composes with `IconTile` for its leading badge (forwarding
+`iconTone` straight through as `IconTile`'s `tone` prop) and accepts any
+`ReactNode` for both `value` and `action`, so it works equally well with
+plain strings, links, chips, or an icon-only `Button` used as an inline
+edit affordance:
+
+```tsx
+<InfoField
+  icon={Mail}
+  iconTone="brand"
+  label="Email"
+  value="jane.doe@company.com"
+  action={
+    <Button variant="tertiary" size="sm" iconOnly aria-label="Edit email">
+      <Pencil className="size-4" />
+    </Button>
+  }
+/>
+```
+
+## Overriding styles
+
+Because `InfoField` resolves its `className` prop through the same `cn()`
+merge utility the rest of the library uses, an app-level override always
+wins over the defaults:
+
+```tsx
+<InfoField icon={Mail} label="Email" value="jane.doe@company.com" className="gap-4" />
+```
+
+## Accessibility
+
+`value` and `action` accept arbitrary nodes, so any interactive content
+placed in `action` (e.g. an icon-only button) is responsible for its own
+accessible name — see the `aria-label` on the edit button above.
+
+## Composition
+
+`InfoField` forwards its ref to the root `<div>` and spreads all native div
+props, so it composes with grids, cards, and any other layout in this
+library without a separate "as child" API.

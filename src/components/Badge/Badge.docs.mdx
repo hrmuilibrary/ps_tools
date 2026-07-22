@@ -1,0 +1,49 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as BadgeStories from './Badge.stories';
+
+<Meta of={BadgeStories} />
+
+# Badge
+
+Displays a small status or metadata label. Styled with plain Tailwind
+utility classes resolved from `variant`/`appearance`/`size` lookup tables —
+no variant-authoring abstraction on top, so consumer apps can override any
+part of it via `className` (merged with `tailwind-merge`, last conflicting
+class wins) rather than fighting a pre-hidden style layer.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Variants
+
+<Stories />
+
+## Overriding styles
+
+Because `Badge` resolves its `className` prop through the same `cn()`
+merge utility the rest of the library uses, an app-level override always
+wins over the variant defaults:
+
+```tsx
+<Badge className="bg-purple-100 text-purple-900 border-purple-300 rounded-full">
+  Custom
+</Badge>
+```
+
+## Dismissible badges
+
+Passing `onDismiss` renders a trailing dismiss button (replacing
+`rightIcon`, if also supplied) that calls the handler on click:
+
+```tsx
+<Badge onDismiss={() => removeTag(tag.id)}>{tag.label}</Badge>
+```
+
+## Composition
+
+`Badge` forwards its ref to the root `<span>` and spreads all native
+`<span>` props, so it composes with tooltips and other components in this
+library without a separate "as child" API.

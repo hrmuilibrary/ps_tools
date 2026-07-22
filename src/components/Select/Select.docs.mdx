@@ -1,0 +1,50 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as SelectStories from './Select.stories';
+
+<Meta of={SelectStories} />
+
+# Select
+
+A custom single-select listbox (not a native `<select>`). Renders as a
+button that toggles a floating option list, styled with plain Tailwind
+utility classes resolved from a `size` lookup table — same pattern as
+`Button`. Supports controlled (`value`/`onChange`) and uncontrolled
+(`defaultValue`) usage, keyboard navigation (arrow keys, Enter/Space,
+Escape), and outside-click dismissal.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Variants
+
+<Stories />
+
+## Controlled vs. uncontrolled
+
+Pass `value` + `onChange` for a controlled select, or `defaultValue` for an
+uncontrolled one — never both. `Select` decides which mode it's in by
+checking whether `value !== undefined`.
+
+```tsx
+// Uncontrolled
+<Select options={options} defaultValue="apple" />
+
+// Controlled
+const [value, setValue] = useState('apple');
+<Select options={options} value={value} onChange={setValue} />
+```
+
+## Validation state
+
+`error` (boolean) switches the trigger to the danger border/ring styles;
+`errorText` does the same and also renders below the control in place of
+`helperText`.
+
+## Composition
+
+`Select` forwards its ref to the trigger `<button>` element. Its root DOM
+node is the wrapping `<div>` (label + trigger + listbox + helper/error
+text), which is where `dataTestId` is applied as `data-test-id`.

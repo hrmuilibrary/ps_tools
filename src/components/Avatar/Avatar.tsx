@@ -1,0 +1,139 @@
+import { forwardRef, useState, type ReactNode } from 'react';
+import { User } from 'lucide-react';
+import { cn } from '../../lib/cn';
+import type { AvatarGroupProps, AvatarProps, AvatarSize, AvatarStatus } from './Avatar.types';
+
+const sizeStyles: Record<AvatarSize, string> = {
+  xs: 'h-6 w-6 text-p-xs',
+  sm: 'h-8 w-8 text-p-sm',
+  md: 'h-10 w-10 text-p-std',
+  lg: 'h-12 w-12 text-p-md',
+  xl: 'h-16 w-16 text-h-xs',
+  '2xl': 'h-20 w-20 text-h-xs',
+};
+
+const statusSize: Record<AvatarSize, string> = {
+  xs: 'h-1.5 w-1.5',
+  sm: 'h-2 w-2',
+  md: 'h-2.5 w-2.5',
+  lg: 'h-3 w-3',
+  xl: 'h-3.5 w-3.5',
+  '2xl': 'h-4 w-4',
+};
+
+const statusColor: Record<AvatarStatus, string> = {
+  online: 'bg-green-500',
+  offline: 'bg-gray-400 dark:bg-gray-500',
+  away: 'bg-yellow-600',
+  busy: 'bg-red-600',
+};
+
+const overlap: Record<AvatarSize, string> = {
+  xs: '-ml-1.5',
+  sm: '-ml-2',
+  md: '-ml-2.5',
+  lg: '-ml-3',
+  xl: '-ml-4',
+  '2xl': '-ml-5',
+};
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return '';
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+}
+
+function colorFromName(name: string): string {
+  const palette = ['bg-brand-500', 'bg-blue-600', 'bg-purple-500', 'bg-pink-500', 'bg-yellow-600', 'bg-green-500'];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash << 5) - hash + name.charCodeAt(i);
+    hash |= 0;
+  }
+  return palette[Math.abs(hash) % palette.length]!;
+}
+
+export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
+  { src, alt, name, size = 'md', status, shape = 'circle', fallback, className, dataTestId, ...rest },
+  ref,
+) {
+  const [errored, setErrored] = useState(false);
+  const showImage = !!src && !errored;
+  const initials = name ? getInitials(name) : '';
+  const bgColor = name ? colorFromName(name) : 'bg-gray-300 dark:bg-gray-600';
+
+  return (
+    <span
+      ref={ref}
+      data-test-id={dataTestId}
+      className={cn('relative inline-flex shrink-0', className)}
+      {...rest}
+    >
+      <span
+        className={cn(
+          'inline-flex items-center justify-center overflow-hidden font-semibold text-white select-none',
+          sizeStyles[size],
+          shape === 'circle' ? 'rounded-full' : 'rounded-md',
+          !showImage && bgColor,
+        )}
+      >
+        {showImage ? (
+          <img
+            src={src}
+            alt={alt ?? name ?? ''}
+            onError={() => setErrored(true)}
+            className="h-full w-full object-cover"
+          />
+        ) : name ? (
+          initials
+        ) : (
+          (fallback ?? <User className="h-1/2 w-1/2 text-white/90" />)
+        )}
+      </span>
+      {status && (
+        <span
+          aria-label={status}
+          className={cn(
+            'absolute right-0 bottom-0 rounded-full ring-2 ring-white',
+            statusSize[size],
+            statusColor[status],
+          )}
+        />
+      )}
+    </span>
+  );
+});
+
+export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(function AvatarGroup(
+  { size = 'md', max, children, className, dataTestId, ...rest },
+  ref,
+) {
+  const items = Array.isArray(children) ? children : ([children] as ReactNode[]);
+  const shown = max !== undefined ? items.slice(0, max) : items;
+  const extra = max !== undefined ? items.length - max : 0;
+
+  return (
+    <div
+      ref={ref}
+      data-test-id={dataTestId}
+      className={cn('inline-flex items-center', className)}
+      {...rest}
+    >
+      {shown.map((child, i) => (
+        <div
+          key={i}
+          className={cn('rounded-full ring-2 ring-white', i > 0 && overlap[size])}
+          style={{ zIndex: shown.length - i }}
+        >
+          {child}
+        </div>
+      ))}
+      {extra > 0 && (
+        <div className={cn('rounded-full ring-2 ring-white', overlap[size])}>
+          <Avatar size={size} name={`+${extra}`} />
+        </div>
+      )}
+    </div>
+  );
+});

@@ -1,0 +1,80 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as MultiSelectStories from './MultiSelect.stories';
+
+<Meta of={MultiSelectStories} />
+
+# MultiSelect
+
+A chip/token multi-select combobox — the multi-value cousin of `Select`.
+Chosen options render as removable chips inline with a type-to-filter
+input; a dropdown lists the remaining options. Options can carry an
+avatar, a description line and a chip badge, so the same API covers both a
+plain tag input and a rich people picker.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Variants
+
+<Stories />
+
+## Controlled only
+
+Unlike `Select`, `MultiSelect` has no uncontrolled mode — `value` (a
+`string[]`) and `onChange` are both required:
+
+```tsx
+const [value, setValue] = useState<string[]>([]);
+<MultiSelect options={options} value={value} onChange={setValue} />
+```
+
+## Options
+
+Each `MultiSelectOption` is data-agnostic:
+
+```tsx
+interface MultiSelectOption {
+  value: string;
+  label: string;
+  description?: string; // second line in the dropdown row
+  avatarSrc?: string;    // shown on the chip and the dropdown row
+  disabled?: boolean;    // non-selectable, dimmed
+  badge?: ReactNode;     // small tag on the chip, e.g. "You"
+}
+```
+
+## Keyboard interaction
+
+- `↓` opens the dropdown, or moves the active option while it's open
+- `↑` moves the active option
+- `Enter` selects the active option
+- `Esc` closes the dropdown
+- `Backspace` on an empty input removes the last removable chip
+
+## Locking and limits
+
+`lockedValues` marks selected values whose chips can't be removed (no `X`
+button rendered). `max` caps the number of selections — once reached, the
+input disables and the placeholder switches to `Limit {max} reached`.
+
+## Non-searchable mode
+
+Set `searchable={false}` for a click-to-open picker with no text filter —
+the input becomes read-only and the dropdown always shows the full
+remaining option list under `suggestionsLabel`.
+
+## Validation state
+
+`error` (boolean) switches the chip row to the danger border/ring styles;
+`errorText` does the same and also renders below the control in place of
+`helperText`.
+
+## Composition
+
+`MultiSelect` forwards its ref to the inner text `<input>`. Its root DOM
+node is the wrapping `<div>` (label + chip row + dropdown + helper/error
+text), which is where `dataTestId` is applied as `data-test-id`. It
+composes with `Avatar` for chip and dropdown-row avatars.

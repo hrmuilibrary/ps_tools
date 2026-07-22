@@ -1,0 +1,18 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+import * as ColorsStories from './Colors.stories';
+
+<Meta of={ColorsStories} />
+
+# Colors
+
+The raw palette scale (brand, gray, green, blue, purple, pink, red, yellow)
+and the semantic aliases built on top of it. Swatches read the live CSS
+custom properties registered in `styles/tokens.css` and `styles/theme.css`,
+so they always reflect the current build — not a hardcoded copy.
+
+Prefer the semantic aliases (`bg-default`, `fg-brand`, `border-danger`, ...)
+in component code; reach for the raw scale only for deliberate cases like
+`bg-brand-500` on a primary button. See [Foundations](/docs/foundations--docs)
+for why.
+
+<Stories />

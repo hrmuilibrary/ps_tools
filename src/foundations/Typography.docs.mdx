@@ -1,0 +1,17 @@
+import { Meta, Stories } from '@storybook/addon-docs/blocks';
+import * as TypographyStories from './Typography.stories';
+
+<Meta of={TypographyStories} />
+
+# Typography
+
+The headline, paragraph, and label scales — `text-h-*`, `text-p-*`, and
+`text-label-*`. Each step pairs a font size with its line height (declared
+as `--text-*` / `--text-*--line-height` in `styles/tokens.css`), so applying
+one utility class sets both.
+
+Use headline steps for page/section titles, paragraph steps for body copy,
+and label steps for form labels, badges, and other UI microcopy — not the
+raw pixel values.
+
+<Stories />

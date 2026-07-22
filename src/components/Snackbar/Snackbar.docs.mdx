@@ -1,0 +1,113 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as SnackbarStories from './Snackbar.stories';
+
+<Meta of={SnackbarStories} />
+
+# Snackbar
+
+A toast-notification system built as a context-provider + hook pair
+instead of a plain presentational component. `SnackbarProvider` mounts a
+portalled toast stack (rendered into `document.body`) alongside its
+`children`, and `useSnackbar()` gives any descendant an imperative
+`show`/`dismiss` API — there's no `<Snackbar />` element to place inline.
+
+<Primary />
+
+## Setup
+
+Mount one `SnackbarProvider` near the root of the app (or the root of a
+Storybook decorator, as in these stories):
+
+```tsx
+import { SnackbarProvider } from '@ps-tools/ui';
+
+function App() {
+  return (
+    <SnackbarProvider>
+      <YourApp />
+    </SnackbarProvider>
+  );
+}
+```
+
+## Usage
+
+Call `useSnackbar()` from any component under the provider:
+
+```tsx
+import { useSnackbar } from '@ps-tools/ui';
+
+function SaveButton() {
+  const { show } = useSnackbar();
+
+  return (
+    <button
+      onClick={() =>
+        show({ message: 'Changes saved', variant: 'success' })
+      }
+    >
+      Save
+    </button>
+  );
+}
+```
+
+`show` returns the toast's `id` (either the one you pass in, or an
+auto-generated one), which you can hold onto to `dismiss()` it early —
+see the "Persistent" story, which shows a toast with `duration: 0` and
+dismisses it manually.
+
+Calling `useSnackbar()` outside a `SnackbarProvider` throws
+(`"useSnackbar must be used inside <SnackbarProvider>"`), matching the
+source implementation's fail-fast behavior rather than silently
+no-op-ing.
+
+## Props
+
+<Controls />
+
+## Variants
+
+`variant` selects the toast's icon and icon color: `success`, `warning`,
+`danger`, `info`, or `neutral` (the default). All variants currently
+share the same dark container styling (`bg-gray-900` / `dark:bg-gray-700`)
+— only the icon and its color change, mirroring the source design
+system exactly.
+
+<Stories />
+
+## Auto-dismiss
+
+Toasts auto-dismiss after `duration` milliseconds (default `5000`). Pass
+`duration: 0` to keep a toast on screen until `dismiss(id)` is called
+explicitly.
+
+## Action button
+
+Pass `action` to render a trailing text button. Clicking it fires
+`action.onClick()` and then dismisses the toast:
+
+```tsx
+show({
+  message: 'Conversation archived',
+  action: { label: 'Undo', onClick: () => restoreConversation() },
+});
+```
+
+## QA hooks
+
+Because there's no `<Snackbar />` JSX element for a consumer to attach
+`dataTestId` to, the QA hook surfaces in two places instead:
+
+- `SnackbarProvider`'s own `dataTestId` prop renders as `data-test-id` on
+  the portalled toast-stack container.
+- Each `show()` call accepts an optional `dataTestId` (part of
+  `SnackbarItem`), rendered as `data-test-id` on that specific toast's
+  root element — see the "Tagging a toast with dataTestId" story.
+
+## Composition
+
+`SnackbarProvider` renders its `children` in place and portals the toast
+stack into `document.body`, so it composes with routers, layout
+providers, and any other component in this library without affecting
+document flow.

@@ -1,0 +1,50 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as TooltipStories from './Tooltip.stories';
+
+<Meta of={TooltipStories} />
+
+# Tooltip
+
+Shows a small contextual bubble next to a single trigger element on hover
+or focus. `Tooltip` clones its `children` to attach `onMouseEnter`,
+`onMouseLeave`, `onFocus`, and `onBlur` handlers (plus `aria-describedby`
+while open) — there's no separate wrapper element around the trigger, so
+the trigger keeps its own layout and event handlers, which `Tooltip`
+composes with rather than replaces.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Sides
+
+The bubble can be positioned on any of the four sides of the trigger, with
+a small arrow pointing back at it.
+
+<Stories />
+
+## Delay
+
+`delay` (default `150`ms) debounces the hover-in so quick mouse passes
+over the trigger don't flash a tooltip. Hiding is immediate.
+
+## Composition
+
+`Tooltip` requires exactly one `ReactElement` as `children` — it clones
+that element rather than rendering its own trigger markup, so it composes
+with `Button` or any other focusable/hoverable element without an extra
+DOM wrapper around the trigger itself. If `children` isn't a valid
+element, `Tooltip` renders it as-is with no tooltip behavior attached.
+
+## Overriding styles
+
+`className` merges (via `cn()`) onto the tooltip bubble itself, so an
+app-level override always wins over the size defaults:
+
+```tsx
+<Tooltip content="Branded tooltip" className="bg-brand-500 text-white">
+  <Button>Hover me</Button>
+</Tooltip>
+```

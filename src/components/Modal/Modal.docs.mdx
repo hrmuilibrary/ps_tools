@@ -1,0 +1,85 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as ModalStories from './Modal.stories';
+
+<Meta of={ModalStories} />
+
+# Modal
+
+A dialog rendered into `document.body` via `createPortal`, layered above the
+rest of the page with a click-to-dismiss overlay. `Modal` is fully
+controlled — it owns no open/closed state of its own — so the consumer
+drives visibility with `open` and reacts to dismissal via `onClose`
+(Escape key, overlay click, or the close button all call it the same way).
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Behavior
+
+- **Portal** — content renders into `document.body`, not in place, so it
+  isn't affected by an ancestor's `overflow`, `transform`, or `z-index`.
+- **Escape & overlay dismissal** — pressing Escape or clicking the backdrop
+  calls `onClose`; set `closeOnOverlayClick={false}` to require an explicit
+  action (e.g. the close button or a footer button) instead.
+- **Scroll lock** — `document.body`'s `overflow` is set to `hidden` while
+  open and restored on close.
+- **Initial focus** — the panel receives focus when the modal opens and the
+  previously focused element regains it on close. This is a one-time focus
+  move, not a full focus trap (Tab can still leave the panel).
+- **Nothing rendered while closed** — `open={false}` returns `null` before
+  the portal call, so no hidden DOM is left behind between opens.
+
+## Header, body & footer
+
+`title`/`description` render as a heading block with the close button
+(when `showClose` is true); omit both to render a bare content panel.
+`children` renders in a body region that scrolls independently
+(`overflow-y-auto`) when content exceeds `max-h-[90vh]`, keeping the header
+and `footer` pinned. `footer` renders in its own bordered row and is where
+action buttons (e.g. Cancel/Confirm) belong — see `WithFooter` below.
+
+## Sizing
+
+`size` maps to a `max-w-*` on the panel: `sm` → `max-w-sm`, `md` →
+`max-w-md`, `lg` → `max-w-lg`, `xl` → `max-w-2xl`, `2xl` → `max-w-4xl`. The
+panel is always `w-full` up to that cap, so it stays responsive on narrow
+viewports.
+
+## Overriding styles
+
+`className` merges onto the panel (not the fixed overlay wrapper) through
+the same `cn()` utility the rest of the library uses, so an app-level
+override always wins over the defaults:
+
+```tsx
+<Modal
+  open={open}
+  onClose={onClose}
+  className="bg-bg-container border-2 border-brand-500"
+>
+  ...
+</Modal>
+```
+
+## Variants
+
+<Stories />
+
+## Composition
+
+`Modal` forwards its ref to the panel element (the styled dialog box, not
+the fixed-position overlay wrapper around it), so consumers can call
+`.focus()` or measure it directly. Because `Modal` is controlled, wiring it
+up to a trigger looks like:
+
+```tsx
+const [open, setOpen] = useState(false);
+
+<Button onClick={() => setOpen(true)}>Open modal</Button>
+<Modal open={open} onClose={() => setOpen(false)} title="Confirm">
+  Are you sure?
+</Modal>
+```

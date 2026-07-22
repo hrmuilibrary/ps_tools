@@ -1,0 +1,75 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as AvatarStories from './Avatar.stories';
+
+<Meta of={AvatarStories} />
+
+# Avatar
+
+Represents a person or entity as a circular (or square) image, initials, or
+icon. Falls back automatically: an image that fails to load (`onError`)
+reverts to initials derived from `name`, and no `name` at all falls back to
+a generic user icon (or a custom `fallback` node). When `name` drives the
+initials, the background color is also derived deterministically from the
+name so the same person always gets the same color.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Sizes
+
+`size` scales both the avatar and its status dot together, from `xs` through
+`2xl`.
+
+## Status indicator
+
+`status` renders a small ring-bordered dot (`online` / `offline` / `away` /
+`busy`) anchored to the bottom-right corner.
+
+## Fallback order
+
+1. `src` renders as an `<img>` — until it fails to load.
+2. `name` renders as initials (max two characters) on a name-derived
+   background color.
+3. A generic user icon, or a caller-supplied `fallback` node, when neither
+   `src` nor `name` is present.
+
+## Variants
+
+<Stories />
+
+## AvatarGroup
+
+`AvatarGroup` stacks `Avatar` children with a slight negative margin and a
+white ring separator, most recent first (`z-index` decreases left to
+right). Pass `max` to cap how many are shown; anything beyond that renders
+as a `+N` avatar using the same name-derived coloring as a regular avatar.
+
+```tsx
+<AvatarGroup size="md" max={3}>
+  <Avatar name="Ada Lovelace" />
+  <Avatar name="Grace Hopper" />
+  <Avatar src="/alan.jpg" alt="Alan Turing" />
+  <Avatar name="Katherine Johnson" />
+  <Avatar name="Margaret Hamilton" />
+</AvatarGroup>
+```
+
+## Overriding styles
+
+Both `Avatar` and `AvatarGroup` resolve their `className` prop through the
+same `cn()` merge utility the rest of the library uses, so an app-level
+override always wins over the component defaults:
+
+```tsx
+<Avatar name="Ada Lovelace" className="ring-2 ring-brand-500 ring-offset-2" />
+```
+
+## Composition
+
+Both components forward their ref (`Avatar` to the root `<span>`,
+`AvatarGroup` to the root `<div>`) and spread all native attributes for
+their element, so they compose with tooltips, links, and other components
+in this library without a separate "as child" API.

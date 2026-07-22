@@ -1,0 +1,49 @@
+import { Meta, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import * as CheckboxStories from './Checkbox.stories';
+
+<Meta of={CheckboxStories} />
+
+# Checkbox
+
+A labeled checkbox input. The native `<input type="checkbox">` is visually
+hidden (`sr-only`) but stays in the tab order and drives every visual state
+of a custom box via the `peer` variant, so the component keeps full native
+keyboard/form/a11y behavior while looking however the design wants.
+
+<Primary />
+
+## Props
+
+<Controls />
+
+## Variants
+
+<Stories />
+
+## Indeterminate
+
+`indeterminate` renders the mixed ("some selected") visual and sets
+`aria-checked="mixed"` on the input. It's a purely visual/ARIA flag — unlike
+the DOM `indeterminate` property, it does not need to be set imperatively via
+a ref, so it composes with both controlled and uncontrolled usage the same
+way `checked`/`defaultChecked` do.
+
+```tsx
+<Checkbox indeterminate label="Select all" />
+```
+
+## Error state
+
+`error` swaps the border (and hover border) to the danger palette and sets
+`aria-invalid` on the input, for use alongside form validation messaging
+rendered by the consumer.
+
+```tsx
+<Checkbox error label="You must accept the terms" />
+```
+
+## Composition
+
+`Checkbox` forwards its ref to the native `<input>` and spreads all native
+input props (minus `size`/`type`, which the component owns), so it composes
+with forms and validation libraries without a separate API.
