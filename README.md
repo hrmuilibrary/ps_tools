@@ -1,4 +1,4 @@
-# @ps-tools/ui
+# Design System
 
 An enterprise React component library and design system built on
 [Tailwind CSS v4](https://tailwindcss.com/) and React 19. It ships as an ESM
